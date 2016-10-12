@@ -1,0 +1,4 @@
+load-balancer:
+  scale: 1
+web:
+  scale: 2
