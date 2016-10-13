@@ -1,9 +1,8 @@
 version: '2'
-
 services:
   load-balancer-web:
     ports:
-    - ${HOST_PORT}:8080
+    - 9000:8080
     image: rancher/load-balancer-service
     links:
     - config-register:config-register
