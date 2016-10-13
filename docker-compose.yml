@@ -1,25 +1,20 @@
-version: '2'
-services:
-  load-balancer-web:
-    ports:
-    - 9000:8080
-    image: rancher/load-balancer-service
-    links:
-    - config-register:config-register
-    labels:
-      io.rancher.container.pull_image: always
-  config-register:
-    labels:
-      io.rancher.container.pull_image: always
-    image: krack/vpn-web-server:${TAG}
-  vpn-server:
-    ports:
-    - 1194:1194/udp
-    volumes:
-    - openvpn-data:/etc/openvpn
-    cap_add:
-    - NET_ADMIN
-    image: kylemanna/openvpn
-volumes:
-  openvpn-data:
-    external: true
+load-balancer-web:
+  ports:
+  - 9000:8080
+  image: rancher/load-balancer-service
+  links:
+  - config-register:config-register
+  labels:
+    io.rancher.container.pull_image: always
+config-register:
+  labels:
+    io.rancher.container.pull_image: always
+  image: krack/vpn-web-server:latest
+vpn-server:
+  ports:
+  - 1194:1194/udp
+  volumes:
+  - openvpn-data:/etc/openvpn
+  cap_add:
+  - NET_ADMIN
+  image: kylemanna/openvpn
