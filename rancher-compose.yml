@@ -1,4 +1,6 @@
-load-balancer:
+load-balancer-web:
   scale: 1
-web:
-  scale: 2
+config-register:
+  scale: 1
+vpn-server:
+  scale: 1
