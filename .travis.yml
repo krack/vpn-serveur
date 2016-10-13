@@ -10,8 +10,6 @@ before_install:
 install:
 - npm install
 script:
-- gulp
-after_success: 
 - docker build -t krack/vpn-web-server:test vpn-web-server\.
 before_deploy:
 - docker tag krack/vpn-web-server:test krack/vpn-web-server:${TRAVIS_TAG}
