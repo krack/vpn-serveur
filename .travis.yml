@@ -10,7 +10,8 @@ before_install:
 install:
 - npm install
 script:
-- docker build -t krack/vpn-web-server:test vpn-web-server\.
+- cd vpn-web-server\
+- docker build -t krack/vpn-web-server:test .
 before_deploy:
 - docker tag krack/vpn-web-server:test krack/vpn-web-server:${TRAVIS_TAG}
 - docker tag krack/vpn-web-server:${TRAVIS_TAG} krack/vpn-web-server:latest
