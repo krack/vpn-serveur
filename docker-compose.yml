@@ -9,12 +9,18 @@ load-balancer-web:
 config-register:
   labels:
     io.rancher.container.pull_image: always
+  volumes:
+  - openvpn-data-test:/etc/openvpn
+  - /var/run/docker.sock:/var/run/docker.sock
+  environment:
+    - HOSTNAME=vpn.spiritofborepaire.fr
+    - VOLUMENAME=openvpn-data-test
   image: krack/vpn-web-server:latest
 vpn-server:
   ports:
   - 1194:1194/udp
   volumes:
-  - openvpn-data:/etc/openvpn
+  - openvpn-data-test:/etc/openvpn
   cap_add:
   - NET_ADMIN
   image: kylemanna/openvpn

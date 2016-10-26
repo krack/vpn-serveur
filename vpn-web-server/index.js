@@ -3,6 +3,10 @@ var exec = require('child_process').exec;
 var app = express();
 var port = process.env.PORT || 8080;
 var http = require('http');
+var fs = require("fs");
+
+var volumeName = process.env.VOLUMENAME || "ovpn-data";
+var hostname = process.env.HOSTNAME;
 
 
 
@@ -44,11 +48,26 @@ app.post('/api/clients/', function(req, res) {
 
 
 /************BUSINESS ***********/
-var baseCommandLine = "docker run --rm -v ovpn-data:/etc/openvpn kylemanna/openvpn "
+
+function baseCommandLine(vars){
+
+	var baseCommandLine = "docker "
+	baseCommandLine+="run --rm "
+	baseCommandLine+=" -v "+volumeName+":/etc/openvpn";
+	if(vars){
+		for(var key in vars) {
+			var val = vars[key];
+			baseCommandLine+=" -e "+key+"="+val;
+		};
+	}
+	baseCommandLine+=" kylemanna/openvpn "
+	return baseCommandLine;
+}
 
 function createClient(name){
 	return new Promise(function (fulfill, reject){
-		var cmd = baseCommandLine+"easyrsa build-client-full "+name+" nopass";
+		var cmd = baseCommandLine()+"easyrsa build-client-full "+name+" nopass";
+		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
 	    		reject();
@@ -60,7 +79,8 @@ function createClient(name){
 };
 function getConfigurationClient(name){
 	return new Promise(function (fulfill, reject){
-		var cmd = baseCommandLine+"ovpn_getclient "+name;
+		var cmd = baseCommandLine()+"ovpn_getclient "+name;
+		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
 	    		reject();
@@ -73,7 +93,8 @@ function getConfigurationClient(name){
 
 function listClients(){
 	return new Promise(function (fulfill, reject){
-		var cmd = baseCommandLine+'ovpn_listclients';
+		var cmd = baseCommandLine()+'ovpn_listclients';
+		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
 	    		reject();
@@ -96,6 +117,69 @@ function listClients(){
   	});	
 };
 
+function initServeur(hostname){
+	console.log("initServeur("+hostname+")");
+	return new Promise(function (fulfill, reject){
+		var cmd = baseCommandLine()+"ovpn_genconfig -u udp://"+hostname;
+		console.log("run cmd "+cmd);
+	    exec(cmd, function(error, stdout, stderr) {
+	    	if(error){
+	    		console.log("command failed"+error);
+	    		reject();
+	    	}else{
+	    		console.log("command succed");
+	    		fulfill();
+	    	}
+		});
+  });	
+};
+
+function initPki(){
+	console.log("initPki()");
+	return new Promise(function (fulfill, reject){
+		var env ={
+			'EASYRSA_BATCH':'1'
+		};
+		var cmd = baseCommandLine(env)+"ovpn_initpki nopass";
+		console.log("run cmd "+cmd);
+	    exec(cmd, function(error, stdout, stderr) {
+	    	if(error){
+	    		reject();
+	    	}else{
+	    		fulfill(stdout);
+	    	}
+		});
+  });	
+};
+
+
+function checkServerInitialized(){
+
+	return new Promise(function (fulfill, reject){
+		fs.exists("/etc/openvpn/pki/ca.crt", function(exists) {
+			if(!exists){			
+				console.info("Server init "+hostname);
+				initServeur(hostname).then(function(){
+					initPki().then(function(){
+						fulfill();
+					},function(error){ 
+						console.error(error);
+						reject();
+					});
+				},function(){ 
+					reject();
+				});
+			}else{
+				console.log("Server already initialized");
+				fulfill();
+			}
+		});
+	});	
+}
+
 /************MAIN  ***********/
-app.listen(port);
-console.log("App listening on port " + port);
+checkServerInitialized().then(function(){
+	app.listen(port);
+
+	console.log("VPN server for " +hostname+ " listening on port " + port);
+});
