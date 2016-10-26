@@ -1,6 +1,6 @@
 load-balancer-web:
   ports:
-  - 9000:8080
+  - 8083:8080
   image: rancher/load-balancer-service
   links:
   - config-register:config-register
