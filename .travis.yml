@@ -5,8 +5,10 @@ services:
 node_js:
 - node
 before_install:
-- curl -L http://releases.rancher.com/compose/v0.8.6/rancher-compose-linux-amd64-v0.8.6.tar.gz -o rancher-compose.tar.gz
-- tar -zxvf rancher-compose.tar.gz && mv ./rancher-compose-v0.8.6/rancher-compose ./rancher-compose && rm -fr ./rancher-compose-v0.8.6 && rm ./rancher-compose.tar.gz
+- curl -L http://releases.rancher.com/compose/v0.8.6/rancher-compose-linux-amd64-v0.8.6.tar.gz
+  -o rancher-compose.tar.gz
+- tar -zxvf rancher-compose.tar.gz && mv ./rancher-compose-v0.8.6/rancher-compose
+  ./rancher-compose && rm -fr ./rancher-compose-v0.8.6 && rm ./rancher-compose.tar.gz
 install:
 - npm install
 script:
@@ -19,12 +21,12 @@ before_deploy:
 - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 - docker push krack/vpn-web-server:${TRAVIS_TAG}
 - docker push krack/vpn-web-server:latest
-- ./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml rm -f
-- ./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml up -d
+- "./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml rm -f"
+- "./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml up -d"
 deploy:
   provider: releases
   api_key:
-    secure: yQO10yfx1a0c+lvgVDnynQk8UUTDugdUdPHxuFUqK0kZIeg+pUNNK22IPbbhv9Ua+G/b3uASv02cZJcKW/B51HbT6jvGDoAZ32Y10MnRIlqfMKQB5ZpIOqz57KaRLnBOl7Twenio27NMeCcPl7L/1wh7DxyJPMnMv8hbg4p4QOm0Twdgt1U6B2ctfD3/6A5rruUcOIoqzDJb61uXZU4WoXaeg9WksFRP8hv7y14gEgKXsA7B3zBYMPq6jDyMEnvQdWpkSGinP5xb1rNjACBAhvcrwXNZzYV8wz+rMcd07h3wfReaMmuJkRqoXV3hZrQkSkal6RmiRtjROYvfs1J5l1RBZVKdw038wbFB5dH/UbMlkn0rsXCYOgnvOC7h1D8micgkR4/V9BC/qiznpiA4CndqvjhYXIW4TjHGS30MxigTBNi9fs0OlHyZTJYzPzf930XY4IUXcBX5VnX9k23ZBfrU0kBasBSvQs+4mv9jwAK8NDGdm9I526TziKi4o9WnzACC2CFVNRe+GGTpVBcxvdHa11es6dUbesWWEU022D1cSg+8FI0bKZ62z8CJ/6iylayQbMCGStIUrQ0fY/IYa100ZUDIxjfJFRQUQx0dYCLEn4FGnEYBagIFLhUVB0qhX7j/p4XfcY+T2YtMzuz9574/mAkzY7fm+ovPXExqHCQ=
-  skip_cleanup: true
+    secure: on3wtuQ2r1VZerSEkHJuntNjvFGP7w1ep6DGI3yMLdX7o4/i1qu8lUr8b+7lxJVRPDJNM176OPQnaz2YIbmTbvAqQ3uYpf6D30ewcyXrTwKpE7Lc6X7GxkhJ0N0iB1mVsQjbECkhd6K/mH1JQb8OVZ1p+Sc+5VlGohiS79QXyQb5PErO6YgC4ebgFXuQaiUIIXV9Iw8p4FZsqfalgSTPozpt71ecDdhLtSlpBqptjUXAQN2XcFSwi2LXreO6/p3SIrWnwVWvMP7kG3oNbOhDyodMoNShwzIoZH6p9yf4hF0GK1horr2PwQBzCHU2+Qv+nAc8dmIXdQRvXL2jQpS2PHsQRdYJHTNnry4vccsEjbyQ/1tz656mmNIXL0rM3sM+HCCq4IHIxLbJR47l8aa9OLy4GKEdSrhUXsOxlQoan2fB+4v+p3ur4AdxSrVkmRdPacCqGuEjRhDK7vUMvyZHnkm93bIFxG7luIJoNWKyuuEd0vf4AayzXHCi+O5cKJ6jws7DSDNuCTT0XtU8ztKuM4BjVgLTOgjRE7fLP0DtVRHazteInLcLP9hv7DsKX3VF9aQ2u6PNKtBhGtG9/PoqAEv/ly5ZrEyLha8g6YHvRN98FsMPLdumlgS9jYljPk+0P5DXVm43HRl64lGQVs1G3gcvBfLUu4un9D+OCvkiVzA=
+  file: ''
   on:
     tags: true
