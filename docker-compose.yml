@@ -6,6 +6,7 @@ load-balancer-web:
   - config-register:config-register
   labels:
     io.rancher.container.pull_image: always
+    proxy_url: vpn.spiritofborepaire.fr
 config-register:
   labels:
     io.rancher.container.pull_image: always
