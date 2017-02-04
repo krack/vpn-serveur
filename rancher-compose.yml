@@ -1,6 +1,13 @@
-load-balancer-web:
-  scale: 1
-config-register:
-  scale: 1
-vpn-server:
-  scale: 1
+version: '2'
+services:
+  load-balancer-api:
+    scale: 1
+    lb_config:
+      port_rules:
+      - source_port: 8083
+        target_port: 8080
+        service: config-register
+  config-register:
+    scale: 1
+  vpn-server:
+    scale: 1

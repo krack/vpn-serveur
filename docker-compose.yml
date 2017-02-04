@@ -1,27 +1,25 @@
-load-balancer-web:
-  ports:
-  - 8083:8080
-  image: rancher/load-balancer-service
-  links:
-  - config-register:config-register
-  labels:
-    io.rancher.container.pull_image: always
-    proxy_url: vpn.spiritofborepaire.fr
-config-register:
-  labels:
-    io.rancher.container.pull_image: always
-  volumes:
-  - openvpn-data-test:/etc/openvpn
-  - /var/run/docker.sock:/var/run/docker.sock
-  environment:
-    - HOSTNAME=vpn.spiritofborepaire.fr
-    - VOLUMENAME=openvpn-data-test
-  image: krack/vpn-web-server:latest
-vpn-server:
-  ports:
-  - 1194:1194/udp
-  volumes:
-  - openvpn-data-test:/etc/openvpn
-  cap_add:
-  - NET_ADMIN
-  image: kylemanna/openvpn
+version: '2'
+services:
+  load-balancer-api:
+    ports:
+    - 8083
+    image: rancher/lb-service-haproxy:v0.4.6
+    labels:
+      proxy_url: vpn.spiritofborepaire.fr
+  config-register:
+    restart: always
+    volumes:
+    - openvpn-data-test:/etc/openvpn
+    - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HOSTNAME=vpn.spiritofborepaire.fr
+      - VOLUMENAME=openvpn-data-test
+    image: krack/vpn-web-server:latest
+  vpn-server:
+    ports:
+    - 1194:1194/udp
+    volumes:
+    - openvpn-data-test:/etc/openvpn
+    cap_add:
+    - NET_ADMIN
+    image: kylemanna/openvpn
