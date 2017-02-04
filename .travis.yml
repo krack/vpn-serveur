@@ -8,10 +8,11 @@ before_install:
 - curl -L https://releases.rancher.com/compose/v0.12.1/rancher-compose-linux-amd64-v0.12.1.tar.gz -o rancher-compose.tar.gz
 - tar -zxvf rancher-compose.tar.gz && mv ./rancher-compose-v0.12.1/rancher-compose ./rancher-compose && rm -fr ./rancher-compose-v0.12.1 && rm ./rancher-compose.tar.gz
 install:
-- cd vpn-web-server\
+- cd vpn-web-server
 - npm install
+- cd ..
 script:
-- cd vpn-web-server\
+- cd vpn-web-server
 - docker build -t krack/vpn-web-server:test .
 - cd ..
 before_deploy:
