@@ -120,7 +120,7 @@ function listClients(){
 function initServeur(hostname){
 	console.log("initServeur("+hostname+")");
 	return new Promise(function (fulfill, reject){
-		var cmd = baseCommandLine()+"ovpn_genconfig -u udp://"+hostname;
+		var cmd = baseCommandLine()+"ovpn_genconfig -u udp://"+hostname+ " -c";
 		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
