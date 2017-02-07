@@ -10,7 +10,7 @@ var volumeName = process.env.VOLUMENAME || "ovpn-data";
 var hostname = process.env.HOSTNAME;
 
 var basicUsername = process.env.BASIC_USERNAME || "user-test";
-var basicPassword = process.env.BASIC_PASSWORDS || "password-test";
+var basicPassword = process.env.BASIC_PASSWORD || "password-test";
 
 
 var morgan = require('morgan');

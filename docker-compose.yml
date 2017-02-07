@@ -14,6 +14,8 @@ services:
     environment:
       - HOSTNAME=vpn.spiritofborepaire.fr
       - VOLUMENAME=openvpn-data-test
+      - VPN_USER=${VPN_USER}
+      - BASIC_PASSWORD=${BASIC_PASSWORD}
     image: krack/vpn-web-server:latest
     labels:
       io.rancher.container.pull_image: always
