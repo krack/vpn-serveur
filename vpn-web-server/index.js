@@ -83,6 +83,7 @@ function createClient(name){
 		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
+	    		console.log("command failed"+error);
 	    		reject();
 	    	}else{
 	    		fulfill();
@@ -96,6 +97,7 @@ function getConfigurationClient(name){
 		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
+	    		console.log("command failed"+error);
 	    		reject();
 	    	}else{
 	    		fulfill(stdout);
@@ -110,6 +112,7 @@ function listClients(){
 		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
+	    		console.log("command failed"+error);
 	    		reject();
 	    	}else{
 		    	var lines = stdout.split("\n");
@@ -157,6 +160,7 @@ function initPki(){
 		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
+	    		console.log("command failed"+error);
 	    		reject();
 	    	}else{
 	    		fulfill(stdout);
