@@ -22,8 +22,8 @@ before_deploy:
 - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 - docker push krack/vpn-web-server:${TRAVIS_TAG}
 - docker push krack/vpn-web-server:latest
-- "./rancher-compose -p vpn-prod rm -f"
-- "./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml up -d"
+- ./rancher-compose -p vpn-prod rm -f
+- ./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml up -d
 deploy:
   provider: releases
   api_key:
