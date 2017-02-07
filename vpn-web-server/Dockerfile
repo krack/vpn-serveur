@@ -1,4 +1,4 @@
-FROM node:0.12.4
+FROM node:alpine
 
 RUN curl -sSL https://get.docker.com/ | sh
 

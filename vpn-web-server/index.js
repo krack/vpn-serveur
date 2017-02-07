@@ -4,10 +4,13 @@ var app = express();
 var port = process.env.PORT || 8080;
 var http = require('http');
 var fs = require("fs");
+var auth = require('http-auth');
 
 var volumeName = process.env.VOLUMENAME || "ovpn-data";
 var hostname = process.env.HOSTNAME;
 
+var basicUsername = process.env.BASIC_USERNAME || "user-test";
+var basicPassword = process.env.BASIC_PASSWORDS || "password-test";
 
 
 var morgan = require('morgan');
@@ -17,6 +20,16 @@ var methodOverride = require('method-override');
 app.use(morgan('dev'));
 app.use(bodyParser.json()); // parse application/json
 app.use(methodOverride('X-HTTP-Method-Override'));
+
+var basic = auth.basic({
+        realm: "test."
+    }, (username, password, callback) => { 
+    	callback(username === basicUsername && password === basicPassword);
+    }
+);
+
+app.use(auth.connect(basic));
+
 
 
 /************** API ***************/
