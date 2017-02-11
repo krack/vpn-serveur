@@ -9,7 +9,7 @@ services:
   config-register:
     restart: always
     volumes:
-    - openvpn-data-test:/etc/openvpn
+    - ${VOLUME_NAME}:/etc/openvpn
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
       HOSTNAME: ${EXPOSE_URL}
