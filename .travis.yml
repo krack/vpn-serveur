@@ -18,7 +18,7 @@ script:
 after_success:
 - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 - docker push krack/vpn-web-server:test
-- ./rancher-compose -p vpn-beta rm -f
+- ./rancher-compose -p vpn-beta -e dev.env rm -f
 - ./rancher-compose -p vpn-beta -f docker-compose.yml -r rancher-compose.yml -e dev.env up -d
 before_deploy:
 - cd vpn-web-server && zip -ro ../vpn-web-server.zip * && cd ..
@@ -27,7 +27,7 @@ before_deploy:
 - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 - docker push krack/vpn-web-server:${TRAVIS_TAG}
 - docker push krack/vpn-web-server:latest
-- ./rancher-compose -p vpn-prod rm -f
+- ./rancher-compose -p vpn-prod -e prod.env rm -f
 - ./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml -e prod.env up -d
 deploy:
   provider: releases
