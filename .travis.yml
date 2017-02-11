@@ -7,6 +7,8 @@ node_js:
 before_install:
 - curl -L https://releases.rancher.com/compose/v0.12.1/rancher-compose-linux-amd64-v0.12.1.tar.gz -o rancher-compose.tar.gz
 - tar -zxvf rancher-compose.tar.gz && mv ./rancher-compose-v0.12.1/rancher-compose ./rancher-compose && rm -fr ./rancher-compose-v0.12.1 && rm ./rancher-compose.tar.gz
+- sed -i 's/$EXPOSE_URL_BETA/'${EXPOSE_URL_BETA}'/g' ./dev.env
+- sed -i 's/$EXPOSE_URL_PROD/'${EXPOSE_URL_PROD}'/g' ./prod.env
 install:
 - cd vpn-web-server
 - npm install
