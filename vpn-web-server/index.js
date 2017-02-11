@@ -2,6 +2,7 @@ var express  = require('express');
 var exec = require('child_process').exec;
 var app = express();
 var port = process.env.PORT || 8080;
+var vpnPort = process.env.VPN_PORT || 1194;
 var http = require('http');
 var fs = require("fs");
 var auth = require('http-auth');
@@ -58,7 +59,14 @@ app.post('/api/clients/', function(req, res) {
 	});
 });
 
-
+app.delete('/api/clients/:name', function(req, res) {
+	removeClient(req.params.name).then(function(clients){
+		res.json(clients);
+	}, 
+	function(){
+		res.status(400).send({ "error": 'Delete client failed!' });
+	});
+});
 
 /************BUSINESS ***********/
 
@@ -79,18 +87,92 @@ function baseCommandLine(vars){
 
 function createClient(name){
 	return new Promise(function (fulfill, reject){
-		var cmd = baseCommandLine()+"easyrsa build-client-full "+name+" nopass";
+		removeClient(name).then(function(){
+			var cmd = baseCommandLine()+"easyrsa build-client-full "+name+" nopass";
+			console.log("run cmd "+cmd);
+		    exec(cmd, function(error, stdout, stderr) {
+		    	if(error){
+		    		console.log("command failed"+error);
+		    		reject();
+		    	}else{
+		    		fulfill();
+		    	}
+			});
+					},
+		function(){
+			reject();
+		});
+  	});	
+};
+
+function revokeClient(name){
+	return new Promise(function (fulfill, reject){
+		var cmd = baseCommandLine()+"easyrsa revoke "+name;
 		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
 	    		console.log("command failed"+error);
 	    		reject();
 	    	}else{
-	    		fulfill();
+	    		var cmd = baseCommandLine()+"easyrsa gen-crl";
+				console.log("run cmd "+cmd);
+			    exec(cmd, function(error, stdout, stderr) {
+			    	if(error){
+			    		console.log("command failed"+error);
+			    		reject();
+			    	}else{
+			    		fulfill();
+			    	}
+				});
 	    	}
 		});
-  });	
+	});
 };
+
+function removeClient(name){
+	return new Promise(function (fulfill, reject){
+		//delete existing user if exist
+		var rmReqCmd = "rm -f /etc/openvpn/pki/reqs/"+name+".req";
+		console.log("run cmd "+rmReqCmd);
+		exec(rmReqCmd, function(error, stdout, stderr) {
+			if(error){
+				console.log("command failed"+error);
+				reject();
+			}else {
+				var rmKeyCmd = "rm -f /etc/openvpn/pki/private/"+name+".key";
+				console.log("run cmd "+rmKeyCmd);
+			    exec(rmKeyCmd, function(error, stdout, stderr) {
+			    	if(error){
+			    		console.log("command failed"+error);
+			    		reject();
+			    	}else{
+			    		var rmCrtCmd = "rm -f /etc/openvpn/pki/issued/"+name+".crt";
+						console.log("run cmd "+rmCrtCmd);
+					    exec(rmCrtCmd, function(error, stdout, stderr) {
+					    	if(error){
+					    		console.log("command failed"+error);
+					    		reject();
+					    	}else{
+					    		var rmIndexCmd = "sed -i /CN="+name+"$/d /etc/openvpn/pki/index.txt";
+								console.log("run cmd "+rmIndexCmd);
+							    exec(rmIndexCmd, function(error, stdout, stderr) {
+							    	if(error){
+							    		console.log("command failed"+error);
+							    		reject();
+							    	}else{
+							    		fulfill();
+							    	}
+								});
+					    	}
+						});
+			    	}
+				});
+			}
+		});
+  	});	
+};
+
+
 function getConfigurationClient(name){
 	return new Promise(function (fulfill, reject){
 		var cmd = baseCommandLine()+"ovpn_getclient "+name;
@@ -136,7 +218,7 @@ function listClients(){
 function initServeur(hostname){
 	console.log("initServeur("+hostname+")");
 	return new Promise(function (fulfill, reject){
-		var cmd = baseCommandLine()+"ovpn_genconfig -u udp://"+hostname+ " -c -t";
+		var cmd = baseCommandLine()+"ovpn_genconfig -u udp://"+hostname+ ":"+vpnPort+" -c -t";
 		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){

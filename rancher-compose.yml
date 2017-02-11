@@ -4,7 +4,7 @@ services:
     scale: 1
     lb_config:
       port_rules:
-      - source_port: 8083
+      - source_port: ${WEB_PORT}
         target_port: 8080
         service: config-register
   config-register:

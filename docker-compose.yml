@@ -2,28 +2,29 @@ version: '2'
 services:
   load-balancer-api:
     ports:
-    - 8083
+    - ${WEB_PORT}
     image: rancher/lb-service-haproxy:v0.4.6
     labels:
-      proxy_url: vpn.spiritofborepaire.fr
+      proxy_url: ${EXPOSE_URL}
   config-register:
     restart: always
     volumes:
     - openvpn-data-test:/etc/openvpn
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      HOSTNAME: vpn.spiritofborepaire.fr
-      VOLUMENAME: openvpn-data-test
+      HOSTNAME: ${EXPOSE_URL}
+      VOLUMENAME: ${VOLUME_NAME}
       BASIC_USERNAME: ${VPN_USER}
       BASIC_PASSWORD: ${VPN_PASSWORD}
-    image: krack/vpn-web-server:latest
+      VPN_PORT: ${VPN_PORT}
+    image: krack/vpn-web-server:${TAG}
     labels:
       io.rancher.container.pull_image: always
   vpn-server:
     ports:
-    - 1194:1194/udp
+    - ${VPN_PORT}:1194/udp
     volumes:
-    - openvpn-data-test:/etc/openvpn
+    -  ${VOLUME_NAME}:/etc/openvpn
     cap_add:
     - NET_ADMIN
     image: kylemanna/openvpn

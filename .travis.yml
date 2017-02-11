@@ -15,6 +15,11 @@ script:
 - cd vpn-web-server
 - docker build -t krack/vpn-web-server:test .
 - cd ..
+after_success:
+- docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+- docker push krack/vpn-web-server:test
+- ./rancher-compose -p vpn-beta rm -f
+- ./rancher-compose -p vpn-beta -f docker-compose.yml -r rancher-compose.yml -e dev.env up -d
 before_deploy:
 - cd vpn-web-server && zip -ro ../vpn-web-server.zip * && cd ..
 - docker tag krack/vpn-web-server:test krack/vpn-web-server:${TRAVIS_TAG}
@@ -23,7 +28,7 @@ before_deploy:
 - docker push krack/vpn-web-server:${TRAVIS_TAG}
 - docker push krack/vpn-web-server:latest
 - ./rancher-compose -p vpn-prod rm -f
-- ./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml up -d
+- ./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml -e prod.env up -d
 deploy:
   provider: releases
   api_key:
