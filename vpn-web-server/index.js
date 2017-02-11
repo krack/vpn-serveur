@@ -199,22 +199,47 @@ function listClients(){
 	    	}else{
 		    	var lines = stdout.split("\n");
 				var clients = [];
-				for(var i = 1; i < lines.length; i++){
-					if(lines[i]){
-						var cell = lines[i].split(",");
-						clients.push({
-							"name" : cell[0],
-							"valid" : cell[3]=== "VALID"
-						});
+				getIps().then(function(ips){
+					for(var i = 1; i < lines.length; i++){
+						if(lines[i]){
+							var cell = lines[i].split(",");
+							clients.push({
+								"name" : cell[0],
+								"valid" : cell[3]=== "VALID",
+								"ip": ips[cell[0]]
+							});
+						}
 					}
-				}
 
-				fulfill(clients);
+					fulfill(clients);
+				},
+				function(){
+					reject();
+				});
 			}
 		});
   	});	
 };
 
+function getIps(){
+	return new Promise(function (fulfill, reject){
+		fs.readFile('/etc/openvpn/ipp.txt', 'utf8', function (err,data) {
+			if (err) {
+				return console.log(err);
+			}else{
+				var ips = {};
+				var lines = data.split('\n');
+				for(var i = 0; i < lines.length; i++){
+					var cuts = lines[i].split(',');
+					if(cuts.length ==2){
+						ips[cuts[0]]= cuts[1];
+					}
+				}
+				fulfill(ips);
+			}
+		});
+	});
+};
 function initServeur(hostname){
 	console.log("initServeur("+hostname+")");
 	return new Promise(function (fulfill, reject){
