@@ -3,7 +3,7 @@ services:
   load-balancer-api:
     ports:
     - ${WEB_PORT}
-    image: rancher/lb-service-haproxy:v0.4.6
+    image: rancher/lb-service-haproxy:v0.5.9
     labels:
       proxy_url: ${EXPOSE_URL}
   config-register:

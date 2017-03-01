@@ -5,8 +5,8 @@ services:
 node_js:
 - node
 before_install:
-- curl -L https://releases.rancher.com/compose/v0.12.1/rancher-compose-linux-amd64-v0.12.1.tar.gz -o rancher-compose.tar.gz
-- tar -zxvf rancher-compose.tar.gz && mv ./rancher-compose-v0.12.1/rancher-compose ./rancher-compose && rm -fr ./rancher-compose-v0.12.1 && rm ./rancher-compose.tar.gz
+- curl -L https://releases.rancher.com/compose/v0.12.2/rancher-compose-linux-amd64-v0.12.2.tar.gz -o rancher-compose.tar.gz
+- tar -zxvf rancher-compose.tar.gz && mv ./rancher-compose-v0.12.2/rancher-compose ./rancher-compose && rm -fr ./rancher-compose-v0.12.2 && rm ./rancher-compose.tar.gz
 - sed -i 's/$EXPOSE_URL_BETA/'${EXPOSE_URL_BETA}'/g' ./dev.env
 - sed -i 's/$EXPOSE_URL_PROD/'${EXPOSE_URL_PROD}'/g' ./prod.env
 install:
@@ -18,18 +18,18 @@ script:
 - docker build -t krack/vpn-web-server:test .
 - cd ..
 after_success:
+- ./rancher-compose -p vpn-beta -e dev.env rm -f
 - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 - docker push krack/vpn-web-server:test
-- ./rancher-compose -p vpn-beta -e dev.env rm -f
 - ./rancher-compose -p vpn-beta -f docker-compose.yml -r rancher-compose.yml -e dev.env up -d
 before_deploy:
+- ./rancher-compose -p vpn-prod -e prod.env rm -f
 - cd vpn-web-server && zip -ro ../vpn-web-server.zip * && cd ..
 - docker tag krack/vpn-web-server:test krack/vpn-web-server:${TRAVIS_TAG}
 - docker tag krack/vpn-web-server:${TRAVIS_TAG} krack/vpn-web-server:latest
 - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 - docker push krack/vpn-web-server:${TRAVIS_TAG}
 - docker push krack/vpn-web-server:latest
-- ./rancher-compose -p vpn-prod -e prod.env rm -f
 - ./rancher-compose -p vpn-prod -f docker-compose.yml -r rancher-compose.yml -e prod.env up -d
 deploy:
   provider: releases
