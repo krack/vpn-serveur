@@ -28,7 +28,7 @@ services:
     -  ${VOLUME_NAME}:/etc/openvpn
     cap_add:
     - NET_ADMIN
-    image: kylemanna/openvpn
+    image: kylemanna/openvpn:2.0.0
     labels:
       io.rancher.scheduler.affinity:host_label: master=1
       io.rancher.container.pull_image: always
