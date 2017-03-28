@@ -9,27 +9,26 @@ services:
   config-register:
     restart: always
     volumes:
-    - openvpn-data:/etc/openvpn
+    - ${VOLUME_NAME}:/etc/openvpn
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
       HOSTNAME: ${EXPOSE_URL}
-      VOLUMENAME: openvpn-data
+      VOLUMENAME: ${VOLUME_NAME}
       BASIC_USERNAME: ${VPN_USER}
       BASIC_PASSWORD: ${VPN_PASSWORD}
       VPN_PORT: ${VPN_PORT}
     image: krack/vpn-web-server:${TAG}
     labels:
+      io.rancher.scheduler.affinity:host_label: master=1
       io.rancher.container.pull_image: always
   vpn-server:
     ports:
     - ${VPN_PORT}:1194/udp
     volumes:
-    -  openvpn-data:/etc/openvpn
+    -  ${VOLUME_NAME}:/etc/openvpn
     cap_add:
     - NET_ADMIN
     image: kylemanna/openvpn
     labels:
+      io.rancher.scheduler.affinity:host_label: master=1
       io.rancher.container.pull_image: always
-volumes:
-  openvpn-data:
-    driver: rancher-nfs
