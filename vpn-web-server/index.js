@@ -243,7 +243,7 @@ function getIps(){
 function initServeur(hostname){
 	console.log("initServeur("+hostname+")");
 	return new Promise(function (fulfill, reject){
-		var cmd = baseCommandLine()+"ovpn_genconfig -e 'ifconfig-pool-persist ipp.txt' -u udp://"+hostname+ ":"+vpnPort+" -c -t";
+		var cmd = baseCommandLine()+"ovpn_genconfig -d -e 'ifconfig-pool-persist ipp.txt' -u udp://"+hostname+ ":"+vpnPort+" -c -t";
 		console.log("run cmd "+cmd);
 	    exec(cmd, function(error, stdout, stderr) {
 	    	if(error){
